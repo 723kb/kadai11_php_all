@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EchoBoard</title>
+  <link href="css/output.css" rel="stylesheet" />
+  <!-- font-awesome 読み込み -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <!-- Google Fonts 読み込み -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+1+Code&family=Mochiy+Pop+One&display=swap"
+    rel="stylesheet" />
+  <!-- ファビコン -->
+  <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
+  <!-- アイコン -->
+  <link rel="apple-touch-icon" href="img/apple-touch-icon-180x180.png" sizes="180x180" />
+</head>
+
+<body class="min-h-screen bg-[#DDEEE7] flex flex-col justify-center items-center font-m-plus-1">
+  <!-- ローダー画像 -->
+  <div id="loader" class="max-w-screen h-screen flex justify-center items-center bg-[#DDEEE7] z-50">
+    <img src="img/loader.png" alt="loader" />
+  </div>
+
+  <script>
+    // ページ読み込み後にフェードアウトと遷移を行う
+    window.addEventListener("load", function () {
+      setTimeout(function () {
+        var loader = document.getElementById("loader");
+        loader.style.transition = "opacity 2s ease";
+        loader.style.opacity = "0";
+        setTimeout(function () {
+          window.location.href = "index.php"; // ローダー画像がフェードアウトしたら直ちにindex.phpに遷移
+        }, 1000); // フェードアウト後の待機時間（1秒）
+      }, 2000); // ローダー画像を表示する時間（2秒）
+    });
+  </script>
+</body>
+
+</html>

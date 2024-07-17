@@ -26,5 +26,3 @@
 
 <!-- Footer -->
 <?php include 'foot.php'; ?>
-
-<!-- いいね機能つける -->

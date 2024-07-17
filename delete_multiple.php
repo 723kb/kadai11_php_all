@@ -51,5 +51,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_ids'])) {
 }
 
 // 管理者画面にリダイレクト
+if ($_SESSION['kanri'] === 1) {
 redirect('admin.php');
+} else {
+  redirect('my_page.php');
+}
 ?>

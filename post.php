@@ -62,6 +62,9 @@ $is_logged_in = isset($_SESSION['chk_ssid']) && $_SESSION['chk_ssid'] === sessio
       // セッションから名前を取得、未設定の場合はデフォルトで「名無しさん」
       $name = isset($_SESSION['username']) ? $_SESSION['username'] : '名無しさん';
       $message = $_POST['message'];
+      // フォームから送られた位置情報を受け取る
+      $latitude = isset($_POST['latitude']) ? $_POST['latitude'] : null; // 緯度を取得（拒否時はnull）
+      $longitude = isset($_POST['longitude']) ? $_POST['longitude'] : null; // 経度を取得（拒否時はnull）
       $picturePath = null;
 
       // ファイルアップロード処理
@@ -76,15 +79,19 @@ $is_logged_in = isset($_SESSION['chk_ssid']) && $_SESSION['chk_ssid'] === sessio
       // データベースに保存
       if ($picturePath !== null) {
         // 写真がある場合
-        $stmt = $pdo->prepare('INSERT INTO kadai11_msgs_table(id, name, message, picture_path, date) VALUES(NULL, :name, :message, :picture_path, now())');
+        $stmt = $pdo->prepare('INSERT INTO kadai11_msgs_table(id, name, message, picture_path, latitude, longitude, date) VALUES(NULL, :name, :message, :picture_path, :latitude , :longitude, now())');
         $stmt->bindValue(':name', $name, PDO::PARAM_STR);
         $stmt->bindValue(':message', $message, PDO::PARAM_STR);
         $stmt->bindValue(':picture_path', $picturePath, PDO::PARAM_STR);
+        $stmt->bindValue(':latitude', $latitude !== '' ? $latitude : null, $latitude !== '' ? PDO::PARAM_STR : PDO::PARAM_NULL);
+        $stmt->bindValue(':longitude', $longitude !== '' ? $longitude : null, $longitude !== '' ? PDO::PARAM_STR : PDO::PARAM_NULL);
       } else {
         // 写真がない場合
-        $stmt = $pdo->prepare('INSERT INTO kadai11_msgs_table(id, name, message, date) VALUES(NULL, :name, :message, now())');
+        $stmt = $pdo->prepare('INSERT INTO kadai11_msgs_table(id, name, message, latitude, longitude, date) VALUES(NULL, :name, :message, :latitude , :longitude, now())');
         $stmt->bindValue(':name', $name, PDO::PARAM_STR);
         $stmt->bindValue(':message', $message, PDO::PARAM_STR);
+        $stmt->bindValue(':latitude', $latitude !== '' ? $latitude : null, $latitude !== '' ? PDO::PARAM_STR : PDO::PARAM_NULL);
+        $stmt->bindValue(':longitude', $longitude !== '' ? $longitude : null, $longitude !== '' ? PDO::PARAM_STR : PDO::PARAM_NULL);
       }
 
       $status = $stmt->execute();
@@ -109,7 +116,7 @@ $is_logged_in = isset($_SESSION['chk_ssid']) && $_SESSION['chk_ssid'] === sessio
         GROUP BY post_id
     ) l ON m.id = l.post_id
     LEFT JOIN kadai11_likes ul ON m.id = ul.post_id AND ul.user_id = :user_id
-";
+    ";
 
     if ($searchWord) {
       $sql .= " WHERE m.message LIKE :searchWord";
@@ -138,7 +145,7 @@ $is_logged_in = isset($_SESSION['chk_ssid']) && $_SESSION['chk_ssid'] === sessio
       }
       echo '>';
 
-      // pictureが空でなければbase64エンコードされた画像データを表示
+      // pictureが空でなければ画像データを表示
       if (!empty($row['picture_path'])) {
         echo '<img src="' . $row['picture_path'] . '" alt="写真" class="w-full h-auto max-w-full max-h-[90vh] object-contain">';
       }
@@ -158,6 +165,11 @@ $is_logged_in = isset($_SESSION['chk_ssid']) && $_SESSION['chk_ssid'] === sessio
         echo '<button class="like-button mr-2 ' . $like_class . '" data-post-id="' . $row['id'] . '"><i class="' . $heart_icon . ' fa-heart"></i></button>';
         echo '<span class="like-count-number">' . $row['like_count'] . '</span>';
         echo '</div>';
+
+        // 位置情報を投稿時に取得している場合
+        if (!empty($row['latitude']) && !empty($row['longitude'])) {
+          echo '<a href="map.php?id=' . $row['id'] . '">位置情報あり</a>';
+        }
 
         echo '<div class="flex justify-center">';
         // ログインしているユーザーが投稿者である場合に編集ボタンを表示

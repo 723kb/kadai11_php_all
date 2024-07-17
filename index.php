@@ -27,4 +27,5 @@ $is_logged_in = isset($_SESSION['chk_ssid']) && $_SESSION['chk_ssid'] === sessio
 
 <!-- jsファイル読み込み -->
 <script src="js/app.js"></script>
+<script src="js/hamMenu.js"></script>
 <script src="js/likes.js"></script>

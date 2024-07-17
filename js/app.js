@@ -1,5 +1,12 @@
+// メニュー内の各ボタンがクリックされた時の処理
+document.querySelectorAll('#menu button').forEach(button => {
+  button.addEventListener('click', event => {
+    closeMenu();
+  });
+});
+
 // ボタンをクリックしたときの処理
-document.getElementById('showSearchButton').addEventListener('click', function() {
+document.getElementById('showSearchButton').addEventListener('click', function () {
   const searchForm = document.getElementById('searchForm');
   const searchInput = document.getElementById('search');
 
@@ -127,12 +134,12 @@ window.addEventListener('load', function () {
     window.scrollTo(0, parseInt(scrollPosition)); // スクロール位置を設定
   }
 
-    // 検索フォームの表示状態を設定する
-    const searchForm = document.getElementById('searchForm');
-    const searchValue = urlParams.get('search');
-    if (searchValue) {
-      searchForm.classList.remove('hidden'); // 検索値がある場合は表示
-    }
+  // 検索フォームの表示状態を設定する
+  const searchForm = document.getElementById('searchForm');
+  const searchValue = urlParams.get('search');
+  if (searchValue) {
+    searchForm.classList.remove('hidden'); // 検索値がある場合は表示
+  }
 });
 
 // モーダル表示のトリガー要素に対するクリックイベントを監視
@@ -165,3 +172,39 @@ document.querySelectorAll('.picture-modal-trigger').forEach(trigger => {
     });
   });
 });
+
+// 現在地取得のトグルボタンクリックイベント
+function toggleButton(checkbox) {
+  const slider = checkbox.nextElementSibling;
+  const thumb = slider.nextElementSibling;
+
+  if (checkbox.checked) {
+    console.log("ボタンがオンになりました");
+    slider.classList.add('bg-[#93CCCA]');
+    thumb.classList.add('translate-x-full');
+  } else {
+    console.log("ボタンがオフになりました");
+    slider.classList.remove('bg-[#93CCCA]');
+    thumb.classList.remove('translate-x-full');
+  }
+}
+
+// 現在地を取得する処理
+function getLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(showPosition, showError);
+  } else {
+    alert('このブラウザでは位置情報がサポートされていません。');
+  }
+}
+
+function showPosition(position) {
+  document.getElementById('latitude').value = position.coords.latitude;
+  document.getElementById('longitude').value = position.coords.longitude;
+  alert('位置情報を取得しました！ Latitude: ' + position.coords.latitude + ', Longitude: ' + position.coords.longitude);
+}
+
+function showError(error) {
+  console.error('位置情報の取得中にエラーが発生しました:', error);
+  alert('位置情報の取得中にエラーが発生しました。もう一度試すか、位置情報サービスを有効にしてください。');
+}

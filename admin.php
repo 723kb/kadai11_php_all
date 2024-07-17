@@ -22,13 +22,15 @@ $posts = $stmtPosts->fetchAll(PDO::FETCH_ASSOC);
 
 <!-- Hamburger menu -->
 <nav>
-  <button id="button" type="button" class="fixed top-3 right-6 z-10 text-slate-600 hover:bg-white transition-colors duration-300 p-1 rounded-md">
+  <button id="menuButton" type="button" class="fixed top-3 right-6 z-10 text-slate-600 hover:bg-white transition-colors duration-300 p-1 rounded-md">
     <i id="bars" class="fa-solid fa-bars fa-2x"></i>
   </button>
-  <ul id="menu" class="fixed top-0 left-0 z-0 w-full h-screen md:h-20 translate-x-full bg-[#8DB1CF] bg-opacity-90 md:bg-opacity-100 text-center text-xl font-bold text-white transition-all ease-linear flex flex-col justify-center items-center md:flex-row md:px-20">
-    <button onclick="showUsers()" class="w-3/4 md:w-1/3 border-2 border-[#D1D1D1] md:border-slate-200 rounded-md py-3 px-6 bg-[#D1D1D1] md:bg-transparent md:hover:bg-[#D1D1D1] text-slate-600 hover:text-slate-600 transition-colors duration-300 p-2 m-2">登録者一覧</button>
-    <button onclick="showPosts()" class="w-3/4 md:w-1/3 border-2 border-[#D1D1D1] md:border-slate-200 rounded-md py-3 px-6 bg-[#D1D1D1] md:bg-transparent md:hover:bg-[#D1D1D1] text-slate-600 hover:text-slate-600 transition-colors duration-300 p-2 m-2">投稿一覧</button>
-    <button onclick="location.href='index.php'" class="w-3/4 md:w-1/3 border-2 border-[#D1D1D1] md:border-slate-200 rounded-md py-3 px-6 bg-[#D1D1D1] md:bg-transparent md:hover:bg-[#D1D1D1]  text-slate-600 hover:text-slate-600 transition-colors duration-300 p-2 m-2">ホーム</button>
+  <ul id="menu" class="fixed top-0 left-0 z-0 w-full h-screen md:h-20 translate-x-full bg-[#8DB1CF] bg-opacity-90 md:bg-opacity-100 text-center text-xl font-bold text-white transition-all ease-linear flex flex-col justify-center items-center md:flex-row md:px-10">
+  <button onclick="location.href='my_page.php'" class="w-3/4 md:w-1/3 border-2 border-[#D1D1D1] md:border-slate-200 rounded-md py-3 px-6 bg-[#D1D1D1] md:bg-transparent md:hover:bg-[#D1D1D1] text-slate-600 hover:text-slate-600 transition-colors duration-300 m-2">マイページ</button>
+    <button onclick="showUsers()" class="w-3/4 md:w-1/3 border-2 border-[#D1D1D1] md:border-slate-200 rounded-md py-3 px-6 bg-[#D1D1D1] md:bg-transparent md:hover:bg-[#D1D1D1] text-slate-600 hover:text-slate-600 transition-colors duration-300 m-2">登録者一覧</button>
+    <button onclick="showPosts()" class="w-3/4 md:w-1/3 border-2 border-[#D1D1D1] md:border-slate-200 rounded-md py-3 px-6 bg-[#D1D1D1] md:bg-transparent md:hover:bg-[#D1D1D1] text-slate-600 hover:text-slate-600 transition-colors duration-300 m-2">投稿一覧</button>
+    <button onclick="location.href='index.php'" class="w-3/4 md:w-1/3 border-2 border-[#D1D1D1] md:border-slate-200 rounded-md py-3 px-6 bg-[#D1D1D1] md:bg-transparent md:hover:bg-[#D1D1D1]  text-slate-600 hover:text-slate-600 transition-colors duration-300 m-2">ホーム</button>
+    <button onclick="location.href='logout.php'" class="w-3/4 md:w-1/3 border-2 border-[#B33030] rounded-md py-3 px-6 text-white md:text-[#B33030]  bg-[#B33030] md:bg-transparent md:hover:bg-[#B33030] md:hover:text-white transition-colors duration-300 m-2">ログアウト</button>
   </ul>
 </nav>
 
@@ -37,7 +39,7 @@ $posts = $stmtPosts->fetchAll(PDO::FETCH_ASSOC);
   <!-- Display area[Start] -->
   <div id="contentArea" class="w-full border-t sm:border">
     <!-- 登録者一覧 管理画面表示時に最初から見せておく -->
-    <div id="userList">
+    <div id="userInfo">
       <form id="deleteUserForm" method="POST" action="delete_multiple.php" onsubmit="return confirm('選択したユーザーを削除しますか？');">
         <h2 class="text-center text-xl mx-auto mt-4 sm:mb-4">登録者一覧</h2>
         <div class="flex justify-center mt-4">
@@ -51,13 +53,13 @@ $posts = $stmtPosts->fetchAll(PDO::FETCH_ASSOC);
           <?php foreach ($users as $user) : ?>
             <label class="block border-t sm:border-b sm:border-t-0 p-4 mb-4 cursor-pointer">
               <input type="checkbox" name="delete_ids[]" value="<?= $user['id'] ?>" class="mr-2">
-              <div>
-                <strong>ID: </strong><?php echo h($user['id']); ?><br>
-                <strong>ログインID: </strong><?php echo h($user['lid']); ?><br>
-                <strong>ユーザー名: </strong><?php echo h($user['username']); ?><br>
-                <strong>EMAIL: </strong><?php echo h($user['email']); ?><br>
-                <strong>ユーザータイプ: </strong><?php echo h($user['kanri_flg'] == 1 ? '管理者' : '一般ユーザー'); ?><br>
-                <strong>登録日時: </strong><?php echo h($user['indate']); ?><br>
+              <div class="m-2 p-2">
+                <strong>ID: </strong><?= h($user['id']); ?><br>
+                <strong>ログインID: </strong><?= h($user['lid']); ?><br>
+                <strong>ユーザー名: </strong><?= h($user['username']); ?><br>
+                <strong>EMAIL: </strong><?= h($user['email']); ?><br>
+                <strong>ユーザータイプ: </strong><?= h($user['kanri_flg'] == 1 ? '管理者' : '一般ユーザー'); ?><br>
+                <strong>登録日時: </strong><?= h($user['indate']); ?><br>
               </div>
             </label>
           <?php endforeach; ?>
@@ -78,16 +80,16 @@ $posts = $stmtPosts->fetchAll(PDO::FETCH_ASSOC);
           <?php foreach ($posts as $post) : ?>
             <label class="block border-t sm:border-b sm:border-t-0 p-4 mb-4 cursor-pointer">
               <input type="checkbox" name="delete_ids[]" value="<?= $post['id'] ?>" class="mr-2">
-              <div>
-                <strong>ユーザー名: </strong><?php echo h($post['name']); ?><br>
-                <strong>内容: </strong><?php echo h($post['message']); ?><br>
+              <div class="m-2 p-2">
+                <strong>ユーザー名: </strong><?= h($post['name']); ?><br>
+                <strong>内容: </strong><?= h($post['message']); ?><br>
                 <?php if (isset($post['picture_path'])) : ?>
                   <strong>画像: </strong><br>
-                  <img src="<?php echo h($post['picture_path']); ?>" alt="写真" class="max-w-100% max-h-[300px] my-2">
+                  <img src="<?= h($post['picture_path']); ?>" alt="写真" class="max-w-100% max-h-[300px] my-2">
                 <?php endif; ?>
-                <strong>投稿日時: </strong><?php echo h($post['date']); ?><br>
+                <strong>投稿日時: </strong><?= h($post['date']); ?><br>
                 <?php if (isset($post['updated_at'])) : ?>
-                  <strong>更新日時: </strong><?php echo h($post['updated_at']); ?><br>
+                  <strong>更新日時: </strong><?= h($post['updated_at']); ?><br>
                 <?php endif; ?>
               </div>
             </label>
@@ -100,47 +102,7 @@ $posts = $stmtPosts->fetchAll(PDO::FETCH_ASSOC);
 </div>
 <!-- Main[End] -->
 
-
-<script>
-  // 登録者一覧と投稿一覧の表示をクリックで切り替える処理
-  function showUsers() {
-    document.getElementById('userList').classList.remove('hidden');
-    document.getElementById('postList').classList.add('hidden');
-  }
-
-  function showPosts() {
-    document.getElementById('userList').classList.add('hidden');
-    document.getElementById('postList').classList.remove('hidden');
-  }
-
-  // ハンバーガーメニューの切り替え処理
-  button.addEventListener('click', event => {
-    toggleMenu();
-  });
-
-  // メニュー内の各ボタンがクリックされた時の処理
-  document.querySelectorAll('#menu button').forEach(button => {
-    button.addEventListener('click', event => {
-      if (button.textContent.trim() !== 'ホーム') {
-        closeMenu();
-      }
-    });
-  });
-
-  // メニューを開閉する関数
-  function toggleMenu() {
-    bars.classList.toggle('fa-bars');
-    bars.classList.toggle('fa-times');
-    menu.classList.toggle('translate-x-full');
-  }
-
-  // メニューを閉じる関数
-  function closeMenu() {
-    bars.classList.remove('fa-times');
-    bars.classList.add('fa-bars');
-    menu.classList.add('translate-x-full');
-  }
-</script>
+<script src="js/hamMenu.js"></script>
 
 <!-- Footer -->
 <?php include 'foot.php'; ?>

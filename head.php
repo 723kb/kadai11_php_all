@@ -16,6 +16,8 @@
   <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
   <!-- アイコン -->
   <link rel="apple-touch-icon" href="img/apple-touch-icon-180x180.png" sizes="180x180">
+  <!-- LeafletのCSS（OpenStreetMapライブラリ） -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 </head>
 
 <body class="min-h-screen bg-[#B5D9DB] flex flex-col justify-center items-center font-m-plus-1">

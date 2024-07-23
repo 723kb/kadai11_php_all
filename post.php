@@ -106,8 +106,8 @@ $is_logged_in = isset($_SESSION['chk_ssid']) && $_SESSION['chk_ssid'] === sessio
 
     $sql = "
     SELECT m.*, u.username, 
-           COALESCE(l.like_count, 0) AS like_count,
-           CASE WHEN ul.user_id IS NOT NULL THEN 1 ELSE 0 END AS is_liked
+            COALESCE(l.like_count, 0) AS like_count,
+            CASE WHEN ul.user_id IS NOT NULL THEN 1 ELSE 0 END AS is_liked
     FROM kadai11_msgs_table m
     LEFT JOIN kadai11_users_table u ON m.name = u.username
     LEFT JOIN (
@@ -133,9 +133,9 @@ $is_logged_in = isset($_SESSION['chk_ssid']) && $_SESSION['chk_ssid'] === sessio
 
     // 投稿内容の表示
     foreach ($results as $row) {
-      echo '<div class="border rounded-md p-2 m-2 bg-white flex flex-col">';
-      echo '<p class="text-sm sm:text-base lg:text-lg"><strong class="text-base sm:text-lg lg:text-xl">名前：</strong>' . h($row['name']) . '</p>';
-      echo '<p class="text-sm sm:text-base lg:text-lg mt-2"><strong class="text-base sm:text-lg lg:text-xl">内容：</strong>' . nl2br(h($row['message'])) . '</p>';
+      echo '<div class="border shadow-md rounded-md p-2 m-2 bg-white flex flex-col">';
+      echo '<h3 class="font-bold text-sm sm:text-base lg:text-lg  mb-2">' . h($row['name']) . '</h3>';
+      echo '<p class="text-sm sm:text-base lg:text-lg  mb-2">' . nl2br(h($row['message'])) . '</p>';
 
 
       // 写真部分にクラスとデータ属性を設定
@@ -147,13 +147,13 @@ $is_logged_in = isset($_SESSION['chk_ssid']) && $_SESSION['chk_ssid'] === sessio
 
       // pictureが空でなければ画像データを表示
       if (!empty($row['picture_path'])) {
-        echo '<img src="' . $row['picture_path'] . '" alt="写真" class="w-full h-auto max-w-full max-h-[90vh] object-contain">';
+        echo '<img src="' . $row['picture_path'] . '" alt="写真" class="w-full h-auto max-w-full max-h-[90vh] object-contain mb-2">';
       }
       echo '</div>';
       echo '<div class="mt-auto">';
-      echo '<p class=" text-sm sm:text-base lg:text-lg"><strong class="text-base sm:text-lg lg:text-xl">投稿：</strong>' . h($row['date']) . '</p>';
+      echo '<p class="text-sm sm:text-base lg:text-lg">投稿：' . h($row['date']) . '</p>';
       if ($row['updated_at']) {
-        echo '<p class="text-sm sm:text-base lg:text-lg"><strong class="text-base sm:text-lg lg:text-xl">更新：</strong>' . h($row['updated_at']) . '</p>';
+        echo '<p class="text-sm sm:text-base lg:text-lg">更新：' . h($row['updated_at']) . '</p>';
       }
       echo '</div>';
 
@@ -162,7 +162,7 @@ $is_logged_in = isset($_SESSION['chk_ssid']) && $_SESSION['chk_ssid'] === sessio
         echo '<div class="like-section" data-user-id="' . h($_SESSION['lid']) . '">';
         $like_class = $row['is_liked'] ? 'liked' : '';
         $heart_icon = $row['is_liked'] ? 'fa-solid' : 'fa-regular';
-        echo '<button class="like-button mr-2 ' . $like_class . '" data-post-id="' . $row['id'] . '"><i class="' . $heart_icon . ' fa-heart"></i></button>';
+        echo '<button class="like-button mr-2' . $like_class . '" data-post-id="' . $row['id'] . '"><i class="' . $heart_icon . ' fa-heart"></i></button>';
         echo '<span class="like-count-number">' . $row['like_count'] . '</span>';
         echo '</div>';
 
@@ -170,6 +170,10 @@ $is_logged_in = isset($_SESSION['chk_ssid']) && $_SESSION['chk_ssid'] === sessio
         if (!empty($row['latitude']) && !empty($row['longitude'])) {
           echo '<a href="map.php?id=' . $row['id'] . '">位置情報あり</a>';
         }
+
+        echo '<div class="mt-2">';
+        echo '<a href="select.php?id=' . $row['id'] . '" class="text-blue-500 hover:text-blue-700">投稿を見る</a>';
+        echo '</div>';
 
         echo '<div class="flex justify-center">';
         // ログインしているユーザーが投稿者である場合に編集ボタンを表示

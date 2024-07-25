@@ -11,6 +11,18 @@ $pdo = db_conn();
 
 // ログインしているユーザーのIDを取得し、セッションがセットされているか確認
 $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
+
+// URLパラメータからIDを取得
+$id = isset($_GET['id']) ? intval($_GET['id']) : null;
+
+// 特定の投稿データを取得（IDが指定されている場合）
+$targetPost = null;
+if ($id) {
+    $stmt = $pdo->prepare("SELECT * FROM kadai11_msgs_table WHERE id = :id AND latitude IS NOT NULL AND longitude IS NOT NULL");
+    $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+    $stmt->execute();
+    $targetPost = $stmt->fetch(PDO::FETCH_ASSOC);
+}
 ?>
 
 <!-- Hamburger menu -->
@@ -64,6 +76,7 @@ $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
       if ($post['updated_at']) {
         echo '<p class="text-sm sm:text-base lg:text-lg">更新：' . h($post['updated_at']) . '</p>';
       }
+      echo '<a href="select.php?id=' . h($post['id']) . '" class="text-blue-500 hover:text-blue-700">投稿を見る</a>';
       echo '</div>';
       echo '</div>';
     }
@@ -86,34 +99,38 @@ document.addEventListener("DOMContentLoaded", function() {
 
   var markers = {}; // マーカーを保存するオブジェクト
 
-  // 地図を特定の位置に移動させ、対応する投稿を表示する関数
-  function centerMapAndShowPost(lat, lng, id) {
+// 地図を特定の位置に移動させ、対応するマーカーを表示する関数
+function centerMapAndShowPost(lat, lng, id) {
+  // まず地図要素までスクロール
+  const mapElement = document.getElementById('map');
+  mapElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  // スクロールが完了したら地図を更新
+  setTimeout(() => {
     map.setView([lat, lng], 15);
     if (markers[id]) {
       markers[id].openPopup();
     }
+  }, 500); // スクロールにかかる時間に応じて調整may be needed
+}
 
-    // 対応する投稿要素を探してスクロール
-    const postElement = document.querySelector(`.post-item[data-id="${id}"]`);
-    if (postElement) {
-      postElement.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center'
-      });
-    }
+// 投稿をクリックしたときの処理
+document.addEventListener('click', function(e) {
+  if (e.target.closest('.post-item')) {
+    const post = e.target.closest('.post-item');
+    const lat = parseFloat(post.dataset.lat);
+    const lng = parseFloat(post.dataset.lng);
+    const id = post.dataset.id;
+
+    centerMapAndShowPost(lat, lng, id);
   }
+});
 
   // データベースから緯度経度を取得して地図に表示する関数
   function getDatabaseLocations() {
     fetch("geolocation.php")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
+      .then((response) => response.json())
       .then((data) => {
-        // 取得した位置情報を地図に表示
         data.forEach((location) => {
           let latitude = parseFloat(location.latitude);
           let longitude = parseFloat(location.longitude);
@@ -123,38 +140,28 @@ document.addEventListener("DOMContentLoaded", function() {
           markers[location.id] = marker;
 
           // マーカーをクリックした際のポップアップを設定
-          if (location.picture_path) {
-            marker.bindPopup(`
+          marker.bindPopup(`
             <strong>名前：</strong>${location.name}<br>
             <strong>内容：</strong>${location.message}<br>
-            <img src="${location.picture_path}" class="object-contain" style="max-width: 100%; max-height: 200px;"><br>
-            <a href="#" onclick="centerMapAndShowPost(${latitude}, ${longitude}, ${location.id}); return false;">投稿を見る</a>
+            ${location.picture_path ? `<img src="${location.picture_path}" class="object-contain" style="max-width: 100%; max-height: 200px;"><br>` : ''}
+            <a href="select.php?id=${location.id}" class="text-blue-500 hover:text-blue-700">投稿を見る</a>
           `);
-          } else {
-            marker.bindPopup(`
-            <strong>名前：</strong>${location.name}<br>
-            <strong>内容：</strong>${location.message}<br>
-            <a href="#" onclick="centerMapAndShowPost(${latitude}, ${longitude}, ${location.id}); return false;">投稿を見る</a>
-          `);
-          }
         });
+
+        // 特定の投稿が指定されている場合、その位置にマップを中心化し、ポップアップを表示
+        <?php if ($targetPost): ?>
+        let targetLat = <?php echo $targetPost['latitude']; ?>;
+        let targetLng = <?php echo $targetPost['longitude']; ?>;
+        let targetId = <?php echo $targetPost['id']; ?>;
+        
+        map.setView([targetLat, targetLng], 15);
+        if (markers[targetId]) {
+          markers[targetId].openPopup();
+        }
+        <?php endif; ?>
       })
-      .catch((error) =>
-        console.error("緯度経度の取得中にエラーが発生しました:", error)
-      );
+      .catch((error) => console.error("緯度経度の取得中にエラーが発生しました:", error));
   }
-
-  // 投稿をクリックしたときの処理
-  document.addEventListener('click', function(e) {
-    if (e.target.closest('.post-item')) {
-      const post = e.target.closest('.post-item');
-      const lat = parseFloat(post.dataset.lat);
-      const lng = parseFloat(post.dataset.lng);
-      const id = post.dataset.id;
-
-      centerMapAndShowPost(lat, lng, id);
-    }
-  });
 
   // 位置情報を取得して地図に表示
   getDatabaseLocations();

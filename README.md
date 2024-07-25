@@ -10,7 +10,7 @@ kadai11_php_all
 
 ## ③DEMO
 
-https://723kb.jp/kadai10_auth/
+https://723kb.jp/kadai11_php_all/
 
 ## ④作ったアプリケーション用のIDまたはPasswordがある場合
 

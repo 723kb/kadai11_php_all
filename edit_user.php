@@ -36,6 +36,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $pass_confirm = h($_POST['pass_confirm']);
   $new_password = !empty($_POST['password']) ? password_hash($_POST['password'], PASSWORD_DEFAULT) : null;
   $user_type = $_POST['user_type'];
+  $admin_password = isset($_POST['admin_password']) ? h($_POST['admin_password']) : '';
+
 
   // パスワードと確認用パスワードが一致しているか確認
   if ($password !== $pass_confirm) {
@@ -55,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   // ユーザー情報更新クエリ
-  $stmtUpdate = $pdo->prepare('UPDATE kadai11_users_table SET lid = :lid, username = :username, email = :email, kanri_flg = :kanri_flg WHERE id = :id');
+  $stmtUpdate = $pdo->prepare('UPDATE kadai11_users_table SET lid = :lid, username = :username, email = :email, kanri_flg = :kanri_flg, updated_at = now() WHERE id = :id');
 
   // バインドと実行
   $stmtUpdate->bindValue(':lid', $lid, PDO::PARAM_STR);
@@ -65,11 +67,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $stmtUpdate->bindValue(':id', $user_id, PDO::PARAM_INT);
   $stmtUpdate->execute();
 
-  // msgsテーブルの投稿者名の更新
-  $stmtUpdateMsgs = $pdo->prepare('UPDATE kadai11_msgs_table SET name = :name WHERE name = (SELECT username FROM kadai11_users_table WHERE id = :id)');
-  $stmtUpdateMsgs->bindValue(':name', $username, PDO::PARAM_STR); // 新しい名前
-  $stmtUpdateMsgs->bindValue(':id', $user_id, PDO::PARAM_INT);
-  $stmtUpdateMsgs->execute();
+// msgsテーブルの投稿者名の更新
+$stmtUpdateMsgs = $pdo->prepare('UPDATE kadai11_msgs_table SET name = :new_name WHERE user_id = :user_id');
+$stmtUpdateMsgs->bindValue(':new_name', $username, PDO::PARAM_STR); // 新しい名前
+$stmtUpdateMsgs->bindValue(':user_id', $user_id, PDO::PARAM_INT);
+$stmtUpdateMsgs->execute();
 
   // パスワードの更新がある場合の処理
   if ($new_password) {

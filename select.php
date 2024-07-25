@@ -89,10 +89,16 @@ if (!$post) {
                 </script>
             <?php endif; ?>
             
-            <div class="mt-6">
+            <div class="flex justify-around mt-6">
                 <a href="index.php" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                    戻る
+                    ホームへ
                 </a>
+                <a href="map.php" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                    マップへ
+                </a>
+            </div>
+            <div class="mt-6">
+
             </div>
         </div>
     </div>

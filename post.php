@@ -79,19 +79,21 @@ $is_logged_in = isset($_SESSION['chk_ssid']) && $_SESSION['chk_ssid'] === sessio
       // データベースに保存
       if ($picturePath !== null) {
         // 写真がある場合
-        $stmt = $pdo->prepare('INSERT INTO kadai11_msgs_table(id, name, message, picture_path, latitude, longitude, date) VALUES(NULL, :name, :message, :picture_path, :latitude , :longitude, now())');
+        $stmt = $pdo->prepare('INSERT INTO kadai11_msgs_table(id, name, message, picture_path, latitude, longitude, date, user_id) VALUES(NULL, :name, :message, :picture_path, :latitude, :longitude, now(), :user_id)');
         $stmt->bindValue(':name', $name, PDO::PARAM_STR);
         $stmt->bindValue(':message', $message, PDO::PARAM_STR);
         $stmt->bindValue(':picture_path', $picturePath, PDO::PARAM_STR);
         $stmt->bindValue(':latitude', $latitude !== '' ? $latitude : null, $latitude !== '' ? PDO::PARAM_STR : PDO::PARAM_NULL);
         $stmt->bindValue(':longitude', $longitude !== '' ? $longitude : null, $longitude !== '' ? PDO::PARAM_STR : PDO::PARAM_NULL);
+        $stmt->bindValue(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
       } else {
         // 写真がない場合
-        $stmt = $pdo->prepare('INSERT INTO kadai11_msgs_table(id, name, message, latitude, longitude, date) VALUES(NULL, :name, :message, :latitude , :longitude, now())');
+        $stmt = $pdo->prepare('INSERT INTO kadai11_msgs_table(id, name, message, latitude, longitude, date, user_id) VALUES(NULL, :name, :message, :latitude, :longitude, now(), :user_id)');
         $stmt->bindValue(':name', $name, PDO::PARAM_STR);
         $stmt->bindValue(':message', $message, PDO::PARAM_STR);
         $stmt->bindValue(':latitude', $latitude !== '' ? $latitude : null, $latitude !== '' ? PDO::PARAM_STR : PDO::PARAM_NULL);
         $stmt->bindValue(':longitude', $longitude !== '' ? $longitude : null, $longitude !== '' ? PDO::PARAM_STR : PDO::PARAM_NULL);
+        $stmt->bindValue(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
       }
 
       $status = $stmt->execute();
@@ -170,19 +172,20 @@ $is_logged_in = isset($_SESSION['chk_ssid']) && $_SESSION['chk_ssid'] === sessio
         if (!empty($row['latitude']) && !empty($row['longitude'])) {
           echo '<a href="map.php?id=' . $row['id'] . '">位置情報あり</a>';
         }
-
+        
+        // 投稿の詳細を見るボタン(map.phpからも遷移可)
         echo '<div class="mt-2">';
         echo '<a href="select.php?id=' . $row['id'] . '" class="text-blue-500 hover:text-blue-700">投稿を見る</a>';
         echo '</div>';
 
         echo '<div class="flex justify-center">';
         // ログインしているユーザーが投稿者である場合に編集ボタンを表示
-        if ($_SESSION['username'] === $row['name']) {
+        if ($_SESSION['user_id'] === $row['user_id']) {
           echo '<button type="button" onclick="location.href=\'edit.php?id=' . $row['id'] . '\'" class="w-1/4 border-2 rounded-md border-[#93CCCA] md:border md:border-slate-200  text-[#93CCCA] md:bg-transparent md:text-inherit md:hover:bg-[#93CCCA] transition-colors duration-300 p-2 m-2"><i class="fas fa-edit"></i></button>';
         }
 
         // ログインしているユーザーが投稿者である場合、または管理者の場合に削除ボタンを表示
-        if ($_SESSION['username'] === $row['name'] || $_SESSION['kanri'] === 1) {
+        if ($_SESSION['user_id'] === $row['user_id'] || $_SESSION['kanri'] === 1) {
           echo '<button type="button" onclick="location.href=\'delete.php?id=' . $row['id'] . '\'" class="w-1/4 border-2 rounded-md border-[#B33030] md:border md:border-slate-200  text-[#B33030] md:bg-transparent md:text-inherit md:hover:bg-[#B33030] md:hover:text-white transition-colors duration-300 p-2 m-2"><i class="fas fa-trash-alt"></i></button>';
         }
         echo '</div>';

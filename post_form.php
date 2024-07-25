@@ -4,10 +4,23 @@ if (session_status() === PHP_SESSION_NONE) {
   session_start();
 }
 require_once('funcs.php');  // 関数群の呼び出し
+require_once('db_conn.php');
 loginCheck();  // ログインチェック
 
-// ユーザー名を取得
-$username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
+// DB接続
+$pdo = db_conn();
+
+// ログインしているユーザーの情報を取得
+if ($is_logged_in && isset($_SESSION['lid'])) {
+  $stmt = $pdo->prepare("SELECT username FROM kadai11_users_table WHERE lid = :lid");
+  $stmt->bindValue(':lid', $_SESSION['lid'], PDO::PARAM_STR);
+  $stmt->execute();
+  $user = $stmt->fetch(PDO::FETCH_ASSOC);
+  if ($user && isset($user['username'])) {
+    $username = $user['username'];
+    $_SESSION['username'] = $username; // セッションにユーザー名を保存
+  }
+}
 ?>
 
 <!-- Hamburger menu -->

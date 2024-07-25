@@ -62,9 +62,20 @@ if ($user_id) {
       </div>
       <div class="flex justify-center mb-auto">
         <!-- 編集ボタン -->
-        <a href="edit_user.php?id=<?= $user['id'] ?>" class="w-2/3 md:w-1/4 border-2 rounded-md border-[#8DB1CF] text-slate-600 bg-[#8DB1CF] hover:bg-white hover:text-[#8DB1CF] transition-colors duration-300 mb-4 p-2 sm:m-2"><i class="fas fa-edit"></i> 編集</a>
+        <form method="get" action="edit_user.php" class="w-2/3 md:w-1/4 mb-4 sm:m-2">
+          <input type="hidden" name="id" value="<?= $user['id'] ?>">
+          <button type="submit" class="w-full border-2 rounded-md border-[#8DB1CF] text-slate-600 bg-[#8DB1CF] hover:bg-white hover:text-[#8DB1CF] transition-colors duration-300 p-2">
+            <i class="fas fa-edit"></i> 編集
+          </button>
+        </form>
+
         <!-- 削除ボタン -->
-        <a href="delete_user.php?id=<?= $user['id'] ?>" class="w-2/3 md:w-1/4 border-2 rounded-md border-[#B33030] text-white bg-[#B33030] hover:bg-transparent hover:text-[#B33030] transition-colors duration-300 mb-4 p-2 sm:m-2" onclick="return confirm('本当に退会しますか？');"><i class="fas fa-trash-alt"></i> 退会</a>
+        <form method="post" action="delete_user.php" class="w-2/3 md:w-1/4 mb-4 sm:m-2" onsubmit="return confirm('本当に退会しますか？');">
+          <input type="hidden" name="id" value="<?= $user['id'] ?>">
+          <button type="submit" class="w-full border-2 rounded-md border-[#B33030] text-white bg-[#B33030] hover:bg-transparent hover:text-[#B33030] transition-colors duration-300 p-2">
+            <i class="fas fa-trash-alt"></i> 退会
+          </button>
+        </form>
       </div>
     </div>
     <!-- 投稿一覧 ボタンクリックで表示を切り替える -->

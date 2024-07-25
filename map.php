@@ -150,9 +150,9 @@ document.addEventListener('click', function(e) {
 
         // 特定の投稿が指定されている場合、その位置にマップを中心化し、ポップアップを表示
         <?php if ($targetPost): ?>
-        let targetLat = <?php echo $targetPost['latitude']; ?>;
-        let targetLng = <?php echo $targetPost['longitude']; ?>;
-        let targetId = <?php echo $targetPost['id']; ?>;
+        let targetLat = <?= $targetPost['latitude']; ?>;
+        let targetLng = <?= $targetPost['longitude']; ?>;
+        let targetId = <?= $targetPost['id']; ?>;
         
         map.setView([targetLat, targetLng], 15);
         if (markers[targetId]) {

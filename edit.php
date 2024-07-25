@@ -27,7 +27,7 @@ if (!$row) {
 
 $error_message = ''; // エラーメッセージ初期化
 
-// POSTリクエスト処理 ユーザーが編集フォームを送信した時に実行
+// POSTリクエスト処理をここで条件分岐
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   if (!isset($_POST['message']) || $_POST['message'] === '') {
     $error_message = '内容が入力されていません';
@@ -35,13 +35,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $error_message = '内容は140文字以内で入力してください';
   }
 
-  // エラーがなければ更新処理を実行する
+  // エラーがなければ
   if (empty($error_message)) {
     // POSTデータを取得
     $id = $_POST['id'];
     $message = $_POST['message'];
     $oldPicturePath = $row['picture_path'];
     $picturePath = $oldPicturePath;  // デフォルトで既存の画像パスを使用
+    $latitude = isset($_POST['latitude']) ? $_POST['latitude'] : null;
+    $longitude = isset($_POST['longitude']) ? $_POST['longitude'] : null;
+
+ // 位置情報の変更をチェック
+$location_changed = ($latitude !== $row['latitude'] || $longitude !== $row['longitude']);
 
     // ファイルアップロード処理
     if (isset($_FILES['picture']) && $_FILES['picture']['error'] !== UPLOAD_ERR_NO_FILE) {
@@ -59,13 +64,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       }
     }
 
-    // エラーがなければ更新処理を実行
+    // エラーがなければ
     if (empty($error_message)) {
-      // 更新SQL作成
-      $stmt = $pdo->prepare('UPDATE kadai11_msgs_table SET message = :message, picture_path = :picture_path, updated_at = now() WHERE id = :id');
+      // 更新SQL作成（位置情報の変更がある場合のみ更新）
+      if ($location_changed) {
+        $stmt = $pdo->prepare('UPDATE kadai11_msgs_table SET message = :message, picture_path = :picture_path, latitude = :latitude, longitude = :longitude, updated_at = now() WHERE id = :id');
+        $stmt->bindValue(':latitude', $latitude !== '' ? $latitude : null, $latitude !== '' ? PDO::PARAM_STR : PDO::PARAM_NULL);
+        $stmt->bindValue(':longitude', $longitude !== '' ? $longitude : null, $longitude !== '' ? PDO::PARAM_STR : PDO::PARAM_NULL);
+      } else {
+        $stmt = $pdo->prepare('UPDATE kadai11_msgs_table SET message = :message, picture_path = :picture_path, updated_at = now() WHERE id = :id');
+      }
+      
       $stmt->bindValue(':message', $message, PDO::PARAM_STR);
       $stmt->bindValue(':picture_path', $picturePath, PDO::PARAM_STR);
       $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+      
       $stmt->execute();
 
       // リダイレクト
@@ -73,7 +86,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
   }
 }
-
 // ユーザー名の取得(アカウントに登録された名前を使うので、セッションから取得する処理が必要)
 $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 ?>
@@ -105,6 +117,19 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
           </div>
         <?php endif; ?>
       </div>
+        <!-- 位置情報取得のチェックボックス -->
+  <div class="pb-4 px-4">
+    <label class="flex items-center cursor-pointer">
+      <span class="text-sm sm:text-base md:text-lg lg:text-xl">現在地の取得：</span>
+      <div class="relative w-14 h-7 bg-gray-200 rounded-full border-2 border-slate-200">
+        <input type="checkbox" id="locationCheckbox" class="sr-only peer" onclick="getLocation();">
+        <span class="absolute inset-0 bg-gray-200 rounded-full transition peer-checked:bg-[#93CCCA]"></span>
+        <span class="absolute inset-y-0 left-0 w-6 h-6 bg-white rounded-full transition-all peer-checked:translate-x-full shadow-md"></span>
+      </div>
+    </label>
+    <input type="hidden" id="latitude" name="latitude" value="<?= h($row['latitude']) ?>">
+    <input type="hidden" id="longitude" name="longitude" value="<?= h($row['longitude']) ?>">
+  </div>
       <div class="pb-4 px-4">
         <label for="picture" class="text-sm sm:text-base md:text-lg lg:text-xl">写真：</label>
         <div class="flex flex-col sm:flex-row justify-center items-center">
@@ -133,6 +158,47 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 
 <!-- edit.php用のjsファイルを読み込み -->
 <script src="js/edit.js"></script>
+<script>
+  function getLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(showPosition, showError);
+  } else {
+    alert("Geolocation is not supported by this browser.");
+  }
+}
+
+function showPosition(position) {
+  document.getElementById("latitude").value = position.coords.latitude;
+  document.getElementById("longitude").value = position.coords.longitude;
+  alert("位置情報を取得しました。");
+}
+
+function showError(error) {
+  switch(error.code) {
+    case error.PERMISSION_DENIED:
+      alert("User denied the request for Geolocation.");
+      break;
+    case error.POSITION_UNAVAILABLE:
+      alert("Location information is unavailable.");
+      break;
+    case error.TIMEOUT:
+      alert("The request to get user location timed out.");
+      break;
+    case error.UNKNOWN_ERROR:
+      alert("An unknown error occurred.");
+      break;
+  }
+}
+
+// ページ読み込み時に既存の位置情報があればチェックボックスをオンにする
+document.addEventListener('DOMContentLoaded', function() {
+  var latitude = document.getElementById('latitude').value;
+  var longitude = document.getElementById('longitude').value;
+  if (latitude && longitude) {
+    document.getElementById('locationCheckbox').checked = true;
+  }
+});
+</script>
 
 <!-- Footer -->
 <?php include 'foot.php'; ?>

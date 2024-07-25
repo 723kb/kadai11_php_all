@@ -91,18 +91,18 @@ if ($user_id) {
             <label class="block border-t sm:border-b sm:border-t-0 p-4 mb-4 cursor-pointer">
               <input type="checkbox" name="delete_ids[]" value="<?= $post['id'] ?>" class="mr-2">
               <div>
-                <strong>ユーザー名: </strong><?php echo h($post['name']); ?><br>
-                <strong>内容: </strong><?php echo h($post['message']); ?><br>
+                <strong>ユーザー名: </strong><?= h($post['name']); ?><br>
+                <strong>内容: </strong><?= h($post['message']); ?><br>
                 <?php if (isset($post['picture_path'])) : ?>
                   <strong>画像: </strong><br>
-                  <img src="<?php echo h($post['picture_path']); ?>" alt="写真" class="max-w-100% max-h-[300px] my-2">
+                  <img src="<?= h($post['picture_path']); ?>" alt="写真" class="max-w-100% max-h-[300px] my-2">
                 <?php endif; ?>
                 <?php if (isset($post['latitude']) && isset($post['longitude'])) : ?>
                   <strong><a href="map.php?id=' . $row['id'] . '">位置情報あり</a></strong><br>
                 <?php endif; ?>
-                <strong>投稿日時: </strong><?php echo h($post['date']); ?><br>
+                <strong>投稿日時: </strong><?= h($post['date']); ?><br>
                 <?php if (isset($post['updated_at'])) : ?>
-                  <strong>更新日時: </strong><?php echo h($post['updated_at']); ?><br>
+                  <strong>更新日時: </strong><?= h($post['updated_at']); ?><br>
                 <?php endif; ?>
               </div>
             </label>

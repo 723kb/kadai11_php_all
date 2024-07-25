@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- データに画像があれば表示 -->
     <?php if (!empty($row['picture_path'])) : ?>
       <div class="mt-2">
-        <img src="<?php echo h($row['picture_path']); ?>" alt="写真" class="w-full max-w-full max-h-[90vh] object-contain">
+        <img src="<?= h($row['picture_path']); ?>" alt="写真" class="w-full max-w-full max-h-[90vh] object-contain">
       </div>
     <?php endif; ?>
     <p class="mt-2"><strong class="text-base sm:text-lg lg:text-xl">投稿：</strong><?= h($row['date']) ?></p>

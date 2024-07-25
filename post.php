@@ -168,10 +168,12 @@ $is_logged_in = isset($_SESSION['chk_ssid']) && $_SESSION['chk_ssid'] === sessio
         echo '<span class="like-count-number">' . $row['like_count'] . '</span>';
         echo '</div>';
 
+        echo '<div class="mt-2">';
         // 位置情報を投稿時に取得している場合
         if (!empty($row['latitude']) && !empty($row['longitude'])) {
-          echo '<a href="map.php?id=' . $row['id'] . '">位置情報あり</a>';
+          echo '<a href="map.php?id=' . $row['id'] . '" class="text-green-500 hover:text-green-700">位置情報あり</a>';
         }
+        echo '</div>';
         
         // 投稿の詳細を見るボタン(map.phpからも遷移可)
         echo '<div class="mt-2">';

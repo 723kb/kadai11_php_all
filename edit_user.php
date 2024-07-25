@@ -106,15 +106,15 @@ $stmtUpdateMsgs->execute();
   <div class="w-full flex flex-col justify-center items-start m-2 p-4 rounded-lg bg-white">
     <div class="p-4">
       <label for="lid" class="text-sm sm:text-base md:text-lg lg:text-xl">ログインID：</label>
-      <input type="text" name="lid" value="<?php echo $lid; ?>" class="w-full h-11 p-2 rounded-md">
+      <input type="text" name="lid" value="<?= $lid; ?>" class="w-full h-11 p-2 rounded-md">
     </div>
     <div class="p-4">
       <label for="username" class="text-sm sm:text-base md:text-lg lg:text-xl">ユーザー名：</label>
-      <input type="text" name="username" value="<?php echo $username; ?>" class="w-full h-11 p-2 rounded-md">
+      <input type="text" name="username" value="<?= $username; ?>" class="w-full h-11 p-2 rounded-md">
     </div>
     <div class="p-4">
       <label class="text-sm sm:text-base md:text-lg lg:text-xl">EMAIL：</label>
-      <input type="email" name="email" value="<?php echo $email; ?>" class="w-full h-11 p-2 rounded-md">
+      <input type="email" name="email" value="<?= $email; ?>" class="w-full h-11 p-2 rounded-md">
     </div>
     <div class="p-4">
       <label class="text-sm sm:text-base md:text-lg lg:text-xl">PASSWORD：</label>

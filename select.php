@@ -103,6 +103,6 @@ if (!$post) {
         </div>
     </div>
 
+    <script src="js/likes.js"></script>
+
     <?php include 'foot.php'; ?>
-</body>
-</html>

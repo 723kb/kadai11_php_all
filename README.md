@@ -12,7 +12,7 @@ kadai11_php_all
 
 ## ③DEMO
 
-https://723kb.jp/kadai11_php_all/
+https://723kb.sakura.ne.jp/kadai11_php_all/
 
 ## ④作ったアプリケーション用のIDまたはPasswordがある場合
 
